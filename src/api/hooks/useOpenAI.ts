@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { RTCPeerConnection } from 'react-native-webrtc'
+import { RTCPeerConnection } from 'react-native-webrtc-web-shim'
 import api from '../index'
 import { OpenAIConnectionResponse } from '../types'
 import WebRTCService from '../../services/WebRTCService'
@@ -10,7 +10,7 @@ const model = 'gpt-4o-realtime-preview-2024-12-17'
 export const useOpenAI = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-  const [ephmeralKey, setEphmeralKey] =
+  const [ephemeralKey, setEphemeralKey] =
     useState<OpenAIConnectionResponse | null>(null)
   const [peerConnection, setPeerConnection] =
     useState<RTCPeerConnection | null>(null)
@@ -19,10 +19,10 @@ export const useOpenAI = () => {
     setIsLoading(true)
     setError(null)
     try {
-      const response = await api.openai.connect()
-      console.log('response', response)
-      setEphmeralKey(response.data.clientSecret.value)
-      return response.data.clientSecret.value
+      api.openai.connect().then((response) => {
+        console.log('response', response)
+        setEphemeralKey(response.data['client_secret']['value'])
+      })
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error occurred'))
       return null
@@ -33,7 +33,7 @@ export const useOpenAI = () => {
 
   const initializeWebRTC = useCallback(async () => {
     try {
-      const pc = WebRTCService.initializePeerConnection()
+      const pc = await WebRTCService.initializePeerConnection()
       setPeerConnection(pc)
 
       // After establishing connection with OpenAI, set up WebRTC
@@ -47,9 +47,26 @@ export const useOpenAI = () => {
         err instanceof Error ? err : new Error('Failed to initialize WebRTC'),
       )
     }
-  }, [ephmeralKey])
+  }, [ephemeralKey])
 
-  
+  const initializeCommsWithOpenAI = useCallback(
+    async (sdp) => {
+      const sdpResponse = await fetch(`${BASE_URL}?model=${model}`, {
+        method: 'POST',
+        body: sdp,
+        headers: {
+          Authorization: `Bearer ${ephemeralKey}`,
+          'Content-Type': 'application/sdp',
+        },
+      })
+      const answer = {
+        type: 'answer',
+        sdp: await sdpResponse.text(),
+      }
+      await peerConnection?.setRemoteDescription(answer)
+    },
+    [ephemeralKey],
+  )
 
   useEffect(() => {
     return () => {
@@ -58,10 +75,11 @@ export const useOpenAI = () => {
   }, [])
 
   return {
-    ephmeralKey,
+    ephemeralKey,
     isLoading,
     error,
     initializeWebRTC,
     peerConnection,
+    initializeCommsWithOpenAI,
   }
 }
