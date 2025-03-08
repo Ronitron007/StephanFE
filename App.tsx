@@ -1,11 +1,12 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Button, ScrollView, SafeAreaView } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './store';
 import { useAppDispatch, useAppSelector } from './store/hooks';
 import { increment, decrement } from './store/slices/counterSlice';
 import OpenAIConnector from './src/components/OpenAIConnector';
+import { WebRTCConnection } from './src/components/WebRTCConnection';
 
 // Counter component that uses Redux
 const Counter = () => {
@@ -24,20 +25,15 @@ const Counter = () => {
 };
 
 // Main App component
-export default function App() {
+const App = () => {
   return (
-    <Provider store={store}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <Text style={styles.title}>React Native with Redux Toolkit</Text>
-          <Counter />
-          <OpenAIConnector />
-          <StatusBar style="auto" />
-        </View>
-      </ScrollView>
-    </Provider>
+    <SafeAreaView>
+      <WebRTCConnection />
+    </SafeAreaView>
   );
-}
+};
+
+export default App;
 
 const styles = StyleSheet.create({
   scrollContainer: {
