@@ -3,16 +3,6 @@ import { RTCPeerConnection } from 'react-native-webrtc-web-shim'
 
 class WebRTCService {
   private peerConnection: RTCPeerConnection | null = null
-  private configuration: RTCConfiguration = {
-    iceServers: [
-      {
-        urls: [
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-        ],
-      },
-    ],
-  }
 
   async initializePeerConnection() {
     this.peerConnection = new RTCPeerConnection()
@@ -21,10 +11,6 @@ class WebRTCService {
     this.peerConnection.addEventListener('connectionstatechange', (e) => {
       console.log('connectionstatechange', e)
     })
-    this.peerConnection.onicecandidate = this.handleIceCandidate
-    this.peerConnection.onconnectionstatechange =
-      this.handleConnectionStateChange
-    this.peerConnection.ondatachannel = this.handleDataChannel
 
     return this.peerConnection
   }

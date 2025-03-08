@@ -1,17 +1,24 @@
-import React from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button, ScrollView, SafeAreaView } from 'react-native';
-import { Provider } from 'react-redux';
-import { store } from './store';
-import { useAppDispatch, useAppSelector } from './store/hooks';
-import { increment, decrement } from './store/slices/counterSlice';
-import OpenAIConnector from './src/components/OpenAIConnector';
-import { WebRTCConnection } from './src/components/WebRTCConnection';
+import React from 'react'
+import { StatusBar } from 'expo-status-bar'
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native'
+import { Provider } from 'react-redux'
+import { store } from './store'
+import { useAppDispatch, useAppSelector } from './store/hooks'
+import { increment, decrement } from './store/slices/counterSlice'
+import OpenAIConnector from './src/components/OpenAIConnector'
+import { WebRTCConnection } from './src/components/WebRTCConnection'
 
 // Counter component that uses Redux
 const Counter = () => {
-  const count = useAppSelector(state => state.counter.value);
-  const dispatch = useAppDispatch();
+  const count = useAppSelector((state) => state.counter.value)
+  const dispatch = useAppDispatch()
 
   return (
     <View style={styles.counterContainer}>
@@ -21,8 +28,8 @@ const Counter = () => {
         <Button title="Decrement" onPress={() => dispatch(decrement())} />
       </View>
     </View>
-  );
-};
+  )
+}
 
 // Main App component
 const App = () => {
@@ -30,10 +37,10 @@ const App = () => {
     <SafeAreaView>
       <WebRTCConnection />
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default App;
+export default App
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -64,4 +71,4 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: 200,
   },
-}); 
+})
